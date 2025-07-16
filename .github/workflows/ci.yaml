@@ -65,8 +65,8 @@ jobs:
       - name: Docker Push
         uses: docker/build-push-action@v6
         with:
-          context: src/product-catalog
-          file: src/product-catalog/Dockerfile
+          context: app/
+          file: Dockerfile
           push: true
           tags: ${{secrets.DOCKER_USERNAME}}/flaskapp:${{github.run_id}}
 
