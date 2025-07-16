@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: flask-container
-          image: rasaninfi/flaskapp:16312443433
+          image: rasaninfi/flaskapp:16312457763
           ports:
             - containerPort: 5000
           resources:
