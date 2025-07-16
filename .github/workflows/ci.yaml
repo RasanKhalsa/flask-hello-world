@@ -87,7 +87,7 @@ jobs:
           commit_message: "Update deployment image to $IMAGE_NAME:${{github.run_id}}"
           file_pattern: 'k8s/deployment.yaml'
           run: git push
-          token: ${{secrets.GITHUB_TOKEN}}
+          token: ${{secrets.GIT_TOKEN}}
         
     
 
