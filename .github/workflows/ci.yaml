@@ -52,30 +52,42 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
+      - name: Install Docker
+        uses: docker/setup-buildx-action@v1
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to Docker Registry
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_TOKEN}}
 
-      - name: Set image tag
-        id: vars
-        run: echo "tag=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+      - name: Docker Push
+        uses: docker/build-push-action@v6
+        with:
+          context: src/product-catalog
+          file: src/product-catalog/Dockerfile
+          push: true
+          tags: ${{secrets.DOCKER_USERNAME}}/flaskapp:${{github.run_id}}
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t $IMAGE_NAME:${{ steps.vars.outputs.tag }} .
-          docker push $IMAGE_NAME:${{ steps.vars.outputs.tag }}
+  update-k8s:
+    runs-on: ubuntu-latest  
+    needs: docker-build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3         
 
       - name: Update Kubernetes manifest
         run: |
-          sed -i "s|image:.*|image: $IMAGE_NAME:${{ steps.vars.outputs.tag }}|" k8s/deployment.yaml
+          sed -i "s|image:.*|image: ${{secrets.DOCKER_USERNAME}}/flaskapp:${{github.run_id}}|" k8s/deployment.yaml
           cat k8s/deployment.yaml
-
-      - name: Commit manifest changes
+      - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update manifest with image ${{ steps.vars.outputs.tag }}"
+          commit_message: "Update deployment image to $IMAGE_NAME:${{github.run_id}}"
           file_pattern: 'k8s/deployment.yaml'
+          run: git push
+          token: ${{secrets.GITHUB_TOKEN}}
+        
+    
+

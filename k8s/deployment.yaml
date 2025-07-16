@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: flask-container
-          image: ghcr.io/RasanKhalsa/flask-hello-world:latest
+          image: rasaninfi/flaskapp:latest
           ports:
             - containerPort: 5000
           resources:
