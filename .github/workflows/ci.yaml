@@ -86,7 +86,7 @@ jobs:
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Update deployment image to $IMAGE_NAME:${{github.run_id}}"
+          commit_message: "[skip ci] Update deployment image to $IMAGE_NAME:${{github.run_id}}"
           file_pattern: 'k8s/deployment.yaml'
           run: git push
           token: ${{secrets.GIT_TOKEN}}
